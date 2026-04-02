@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { UserPlus, X, MapPin, Clock, AlertTriangle, Trophy, Tv, ChevronRight } from 'lucide-react';
+import { UserPlus, X, MapPin, Clock, AlertTriangle, Tv, ChevronRight } from 'lucide-react';
 import { supabase } from '@/lib/supabase-client';
 import type { Evento } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -330,23 +330,8 @@ export default function PublicoPage() {
           )}
         </div>
 
-        {/* Footer links */}
-        <div className="flex flex-col gap-3">
-          {eventoAtivo && (
-            <Link
-              href={`/publico/game/${eventoAtivo.id}`}
-              className="flex items-center justify-center gap-2 w-full h-12 rounded-xl bg-[#22c55e]/10 border border-[#22c55e]/30 text-[#22c55e] font-bold text-sm hover:bg-[#22c55e]/15 transition-colors"
-            >
-              <Tv size={16} /> Tela do Jogo (TV)
-            </Link>
-          )}
-          <Link
-            href="/publico/ranking"
-            className="flex items-center justify-center gap-2 w-full h-12 rounded-xl bg-[#141414] border border-[#2a2a2a] text-[#888] font-bold text-sm hover:bg-[#1a1a1a] transition-colors"
-          >
-            <Trophy size={16} /> Ranking do Circuito
-          </Link>
-        </div>
+        {/* spacer for bottom nav */}
+        <div className="h-4" />
       </div>
     </div>
   );
