@@ -15,7 +15,6 @@ export default function JogadoresPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [revealPix, setRevealPix] = useState<Set<string>>(new Set());
 
-  // Form state
   const [formNome, setFormNome] = useState('');
   const [formApelido, setFormApelido] = useState('');
   const [formPix, setFormPix] = useState('');
@@ -96,50 +95,49 @@ export default function JogadoresPage() {
   const ativos = filtered.filter((p) => p.ativo);
   const inativos = filtered.filter((p) => !p.ativo);
 
-  function PlayerForm({ isEdit, playerId }: { isEdit: boolean; playerId?: string }) {
-    return (
-      <div className="rounded-xl bg-[#141414] border border-[#8b5cf6]/30 p-4 mb-4">
-        <div className="flex flex-col gap-3">
-          <input
-            type="text"
-            placeholder="Nome completo"
-            value={formNome}
-            onChange={(e) => setFormNome(e.target.value)}
-            className="w-full h-14 px-4 rounded-xl bg-[#1e1e1e] border border-[#2a2a2a] text-[#f0f0f0] text-lg font-bold placeholder:text-[#888] focus:outline-none focus:border-[#8b5cf6]"
-          />
-          <input
-            type="text"
-            placeholder="Apelido (exibido no app)"
-            value={formApelido}
-            onChange={(e) => setFormApelido(e.target.value)}
-            className="w-full h-14 px-4 rounded-xl bg-[#1e1e1e] border border-[#2a2a2a] text-[#f0f0f0] text-lg font-bold placeholder:text-[#888] focus:outline-none focus:border-[#8b5cf6]"
-          />
-          <input
-            type="text"
-            placeholder="Chave Pix (tel, email, cpf...)"
-            value={formPix}
-            onChange={(e) => setFormPix(e.target.value)}
-            className="w-full h-14 px-4 rounded-xl bg-[#1e1e1e] border border-[#2a2a2a] text-[#f0f0f0] text-lg font-bold placeholder:text-[#888] focus:outline-none focus:border-[#8b5cf6]"
-          />
-          <div className="flex gap-3">
-            <button
-              onClick={isEdit ? () => handleUpdate(playerId!) : handleCreate}
-              className="flex-1 flex items-center justify-center gap-2 min-h-[56px] rounded-xl bg-[#22c55e] text-[#0a0a0a] font-bold text-lg hover:bg-[#1ea550] transition-colors"
-            >
-              <Save size={20} />
-              {isEdit ? 'SALVAR' : 'CRIAR'}
-            </button>
-            <button
-              onClick={resetForm}
-              className="flex items-center justify-center min-w-[56px] min-h-[56px] rounded-xl bg-[#2a2a2a] text-[#888] hover:bg-[#333] transition-colors"
-            >
-              <X size={24} />
-            </button>
-          </div>
+  const formJSX = (isEdit: boolean, playerId?: string) => (
+    <div className="rounded-xl bg-[#141414] border border-[#8b5cf6]/30 p-4 mb-4">
+      <div className="flex flex-col gap-3">
+        <input
+          type="text"
+          placeholder="Nome completo"
+          value={formNome}
+          onChange={(e) => setFormNome(e.target.value)}
+          autoFocus
+          className="w-full h-14 px-4 rounded-xl bg-[#1e1e1e] border border-[#2a2a2a] text-[#f0f0f0] text-lg font-bold placeholder:text-[#888] focus:outline-none focus:border-[#8b5cf6]"
+        />
+        <input
+          type="text"
+          placeholder="Apelido (exibido no app)"
+          value={formApelido}
+          onChange={(e) => setFormApelido(e.target.value)}
+          className="w-full h-14 px-4 rounded-xl bg-[#1e1e1e] border border-[#2a2a2a] text-[#f0f0f0] text-lg font-bold placeholder:text-[#888] focus:outline-none focus:border-[#8b5cf6]"
+        />
+        <input
+          type="text"
+          placeholder="Chave Pix (tel, email, cpf...)"
+          value={formPix}
+          onChange={(e) => setFormPix(e.target.value)}
+          className="w-full h-14 px-4 rounded-xl bg-[#1e1e1e] border border-[#2a2a2a] text-[#f0f0f0] text-lg font-bold placeholder:text-[#888] focus:outline-none focus:border-[#8b5cf6]"
+        />
+        <div className="flex gap-3">
+          <button
+            onClick={isEdit ? () => handleUpdate(playerId!) : handleCreate}
+            className="flex-1 flex items-center justify-center gap-2 min-h-[56px] rounded-xl bg-[#22c55e] text-[#0a0a0a] font-bold text-lg hover:bg-[#1ea550] transition-colors"
+          >
+            <Save size={20} />
+            {isEdit ? 'SALVAR' : 'CRIAR'}
+          </button>
+          <button
+            onClick={resetForm}
+            className="flex items-center justify-center min-w-[56px] min-h-[56px] rounded-xl bg-[#2a2a2a] text-[#888] hover:bg-[#333] transition-colors"
+          >
+            <X size={24} />
+          </button>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 
   return (
     <div className="p-4 md:p-6 max-w-2xl mx-auto">
@@ -154,7 +152,6 @@ export default function JogadoresPage() {
         </button>
       </div>
 
-      {/* Search */}
       <div className="relative mb-4">
         <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#888]" />
         <input
@@ -166,7 +163,7 @@ export default function JogadoresPage() {
         />
       </div>
 
-      {showForm && <PlayerForm isEdit={false} />}
+      {showForm && formJSX(false)}
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
@@ -178,7 +175,7 @@ export default function JogadoresPage() {
             {ativos.map((player) => (
               <div key={player.id}>
                 {editingId === player.id ? (
-                  <PlayerForm isEdit={true} playerId={player.id} />
+                  formJSX(true, player.id)
                 ) : (
                   <div className="flex items-center gap-3 rounded-xl bg-[#141414] border border-[#2a2a2a] p-4">
                     <div className="flex-1 min-w-0">

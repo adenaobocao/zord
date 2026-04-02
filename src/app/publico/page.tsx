@@ -57,7 +57,13 @@ export default function PublicoPage() {
         </div>
       )}
 
-      <div className="w-full max-w-lg mt-8">
+      <div className="w-full max-w-lg mt-8 flex flex-col gap-3">
+        <Link
+          href="/publico/inscricao"
+          className="flex items-center justify-center gap-2 w-full h-14 rounded-xl bg-[#8b5cf6] text-white font-bold hover:bg-[#7c3aed] transition-colors"
+        >
+          Proximo Evento - Inscreva-se!
+        </Link>
         <Link
           href="/publico/ranking"
           className="flex items-center justify-center gap-2 w-full h-14 rounded-xl bg-[#141414] border border-[#2a2a2a] text-[#f0f0f0] font-bold hover:bg-[#1a1a1a] transition-colors"
