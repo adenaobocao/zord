@@ -1,8 +1,10 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, Trophy, Settings } from 'lucide-react';
+import { LayoutDashboard, Users, Trophy, Settings, LogOut } from 'lucide-react';
+import { supabase } from '@/lib/supabase-client';
 import { ToastProvider } from '@/components/toast';
 import { cn } from '@/lib/utils';
 
@@ -15,10 +17,52 @@ const navItems = [
 
 export default function GerenteLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [authed, setAuthed] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session && pathname !== '/gerente/login') {
+        router.replace('/gerente/login');
+      } else {
+        setAuthed(!!session);
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session && pathname !== '/gerente/login') {
+        router.replace('/gerente/login');
+        setAuthed(false);
+      } else {
+        setAuthed(!!session);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [pathname, router]);
+
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    router.push('/gerente/login');
+  }
 
   function isActive(href: string) {
     if (href === '/gerente') return pathname === '/gerente';
     return pathname.startsWith(href);
+  }
+
+  // Login page - no nav
+  if (pathname === '/gerente/login') {
+    return <ToastProvider>{children}</ToastProvider>;
+  }
+
+  // Loading auth check
+  if (authed === null) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-8 h-8 border-4 border-[#8b5cf6] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
   }
 
   return (
@@ -49,6 +93,13 @@ export default function GerenteLayout({ children }: { children: React.ReactNode 
               </Link>
             );
           })}
+          <button
+            onClick={handleLogout}
+            className="ml-auto flex items-center gap-2 px-4 py-2 rounded-lg text-[#888] hover:text-[#ef4444] hover:bg-[#ef4444]/10 font-bold text-sm transition-colors"
+          >
+            <LogOut size={18} />
+            Sair
+          </button>
         </header>
 
         {/* Content */}
