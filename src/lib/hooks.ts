@@ -32,19 +32,36 @@ export function useEvento(eventoId: string) {
   // Initial load
   useEffect(() => { load(); }, [load]);
 
-  // Realtime subscriptions
+  // Realtime subscriptions + polling fallback
   useEffect(() => {
+    let realtimeActive = false;
+
     const channel = supabase
       .channel(`evento-${eventoId}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'eventos', filter: `id=eq.${eventoId}` }, () => {
+        realtimeActive = true;
         loadEvento();
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'participacoes', filter: `evento_id=eq.${eventoId}` }, () => {
+        realtimeActive = true;
         loadParticipacoes();
       })
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    // Polling fallback: if realtime isn't firing, poll every 5s
+    const poll = setInterval(() => {
+      if (!realtimeActive) {
+        loadEvento();
+        loadParticipacoes();
+      }
+      // Reset flag each cycle to detect if realtime stops working
+      realtimeActive = false;
+    }, 5000);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(poll);
+    };
   }, [eventoId, loadEvento, loadParticipacoes]);
 
   // Computed values
