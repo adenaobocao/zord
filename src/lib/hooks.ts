@@ -77,9 +77,15 @@ export function useEvento(eventoId: string) {
   const ativos = participacoes.filter((p) => !p.eliminado);
   const eliminados = participacoes.filter((p) => p.eliminado).sort((a, b) => (b.colocacao || 0) - (a.colocacao || 0));
 
-  // Actions
+  // Helper: optimistic update for a single participacao
+  function optimisticUpdate(id: string, changes: Partial<Participacao>) {
+    setParticipacoes((prev) => prev.map((p) => p.id === id ? { ...p, ...changes } : p));
+  }
+
+  // Actions (optimistic: update UI first, then sync to server)
   async function updateStatus(status: Evento['status']) {
-    await supabase.from('eventos').update({ status }).eq('id', eventoId);
+    setEvento((prev) => prev ? { ...prev, status } : prev);
+    supabase.from('eventos').update({ status }).eq('id', eventoId);
   }
 
   async function addPlayer(playerId: string) {
@@ -93,64 +99,54 @@ export function useEvento(eventoId: string) {
       pago: false,
       eliminado: false,
     });
+    loadParticipacoes();
   }
 
   async function removePlayer(participacaoId: string) {
-    await supabase.from('participacoes').delete().eq('id', participacaoId);
+    setParticipacoes((prev) => prev.filter((p) => p.id !== participacaoId));
+    supabase.from('participacoes').delete().eq('id', participacaoId);
   }
 
   async function addRebuy(participacao: Participacao) {
     if (!evento) return;
     const newBuyIns = participacao.buy_ins + 1;
     const newTotal = calcTotalDevido(newBuyIns, evento.rebuy_valor, participacao.addon, evento.addon_valor, evento.buy_in);
-    await supabase.from('participacoes').update({
-      buy_ins: newBuyIns,
-      total_devido: newTotal,
-    }).eq('id', participacao.id);
+    optimisticUpdate(participacao.id, { buy_ins: newBuyIns, total_devido: newTotal });
+    supabase.from('participacoes').update({ buy_ins: newBuyIns, total_devido: newTotal }).eq('id', participacao.id);
   }
 
   async function undoRebuy(participacao: Participacao) {
     if (!evento || participacao.buy_ins <= 1) return;
     const newBuyIns = participacao.buy_ins - 1;
     const newTotal = calcTotalDevido(newBuyIns, evento.rebuy_valor, participacao.addon, evento.addon_valor, evento.buy_in);
-    await supabase.from('participacoes').update({
-      buy_ins: newBuyIns,
-      total_devido: newTotal,
-    }).eq('id', participacao.id);
+    optimisticUpdate(participacao.id, { buy_ins: newBuyIns, total_devido: newTotal });
+    supabase.from('participacoes').update({ buy_ins: newBuyIns, total_devido: newTotal }).eq('id', participacao.id);
   }
 
   async function toggleAddon(participacao: Participacao) {
     if (!evento) return;
     const newAddon = !participacao.addon;
     const newTotal = calcTotalDevido(participacao.buy_ins, evento.rebuy_valor, newAddon, evento.addon_valor, evento.buy_in);
-    await supabase.from('participacoes').update({
-      addon: newAddon,
-      total_devido: newTotal,
-    }).eq('id', participacao.id);
+    optimisticUpdate(participacao.id, { addon: newAddon, total_devido: newTotal });
+    supabase.from('participacoes').update({ addon: newAddon, total_devido: newTotal }).eq('id', participacao.id);
   }
 
   async function togglePago(participacao: Participacao) {
     const newPago = !participacao.pago;
-    await supabase.from('participacoes').update({
-      pago: newPago,
-      pago_em: newPago ? new Date().toISOString() : null,
-    }).eq('id', participacao.id);
+    optimisticUpdate(participacao.id, { pago: newPago, pago_em: newPago ? new Date().toISOString() : null });
+    supabase.from('participacoes').update({ pago: newPago, pago_em: newPago ? new Date().toISOString() : null }).eq('id', participacao.id);
   }
 
   async function eliminar(participacao: Participacao) {
     const ativosAtual = participacoes.filter((p) => !p.eliminado);
-    const colocacao = ativosAtual.length; // last active gets highest position number
-    await supabase.from('participacoes').update({
-      eliminado: true,
-      colocacao,
-    }).eq('id', participacao.id);
+    const colocacao = ativosAtual.length;
+    optimisticUpdate(participacao.id, { eliminado: true, colocacao });
+    supabase.from('participacoes').update({ eliminado: true, colocacao }).eq('id', participacao.id);
   }
 
   async function reativar(participacao: Participacao) {
-    await supabase.from('participacoes').update({
-      eliminado: false,
-      colocacao: null,
-    }).eq('id', participacao.id);
+    optimisticUpdate(participacao.id, { eliminado: false, colocacao: null });
+    supabase.from('participacoes').update({ eliminado: false, colocacao: null }).eq('id', participacao.id);
   }
 
   async function definirCampeao() {
