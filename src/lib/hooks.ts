@@ -69,8 +69,9 @@ export function useEvento(eventoId: string) {
   const totalBuyIns = participacoes.reduce((acc, p) => acc + p.buy_ins, 0);
   const totalAddons = participacoes.filter((p) => p.addon).length;
   const totalArrecadado = participacoes.reduce((acc, p) => acc + p.total_devido, 0);
-  const prizePool = evento ? calcPrizePool(totalArrecadado, evento.rake_percent) : 0;
-  const rake = totalArrecadado - prizePool;
+  const rakeValor = evento?.rake_valor ?? evento?.rake_percent ?? 0;
+  const prizePool = evento ? calcPrizePool(totalArrecadado, rakeValor, totalJogadores) : 0;
+  const rake = rakeValor * totalJogadores;
   const premiacao = evento ? calcPremiacao(prizePool, evento.estrutura_premiacao as number[]) : [];
   const pagos = participacoes.filter((p) => p.pago).length;
   const todosPagos = pagos === totalJogadores && totalJogadores > 0;

@@ -18,9 +18,11 @@ export function calcTotalDevido(
 
 export function calcPrizePool(
   totalArrecadado: number,
-  rakePercent: number
+  rakeValor: number,
+  numJogadores: number
 ): number {
-  return totalArrecadado * (1 - rakePercent / 100);
+  // Rake is a fixed amount per initial buy-in (e.g. R$10 per player)
+  return totalArrecadado - (rakeValor * numJogadores);
 }
 
 export function calcPremiacao(

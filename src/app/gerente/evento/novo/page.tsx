@@ -30,7 +30,7 @@ export default function NovoEventoPage() {
   const [buyIn, setBuyIn] = useState(50);
   const [rebuyValor, setRebuyValor] = useState(50);
   const [addonValor, setAddonValor] = useState(50);
-  const [rakePercent, setRakePercent] = useState(10);
+  const [rakeValor, setRakeValor] = useState(10);
   const [timerMinutos, setTimerMinutos] = useState(15);
   const [pixBanco, setPixBanco] = useState('');
   const [premiacao, setPremiacao] = useState([50, 30, 20]);
@@ -47,7 +47,7 @@ export default function NovoEventoPage() {
         setBuyIn(config.buy_in_padrao);
         setRebuyValor(config.rebuy_padrao);
         setAddonValor(config.addon_padrao);
-        setRakePercent(config.rake_padrao);
+        setRakeValor(config.rake_valor_padrao ?? config.rake_padrao ?? 10);
         setPixBanco(config.pix_banco);
         if (Array.isArray(config.estrutura_premiacao_padrao)) {
           setPremiacao(config.estrutura_premiacao_padrao as number[]);
@@ -83,7 +83,8 @@ export default function NovoEventoPage() {
       buy_in: buyIn,
       rebuy_valor: rebuyValor,
       addon_valor: addonValor,
-      rake_percent: rakePercent,
+      rake_valor: rakeValor,
+      rake_percent: 0,
       status: 'cadastro' as const,
       timer_minutos: timerMinutos,
       timer_restante_ms: timerMinutos * 60 * 1000,
@@ -179,11 +180,11 @@ export default function NovoEventoPage() {
             />
           </div>
           <div>
-            <label className="text-[#888] text-xs font-bold uppercase mb-1 block">Rake (%)</label>
+            <label className="text-[#888] text-xs font-bold uppercase mb-1 block">Rake por buy-in (R$)</label>
             <input
               type="number"
-              value={rakePercent}
-              onChange={(e) => setRakePercent(Number(e.target.value))}
+              value={rakeValor}
+              onChange={(e) => setRakeValor(Number(e.target.value))}
               className="w-full h-14 px-4 rounded-xl bg-[#141414] border border-[#2a2a2a] text-[#f0f0f0] text-lg font-bold focus:outline-none focus:border-[#8b5cf6]"
             />
           </div>

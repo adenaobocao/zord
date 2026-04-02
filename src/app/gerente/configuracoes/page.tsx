@@ -17,7 +17,7 @@ export default function ConfiguracoesPage() {
   const [buyInPadrao, setBuyInPadrao] = useState(50);
   const [rebuyPadrao, setRebuyPadrao] = useState(50);
   const [addonPadrao, setAddonPadrao] = useState(50);
-  const [rakePadrao, setRakePadrao] = useState(10);
+  const [rakeValorPadrao, setRakeValorPadrao] = useState(10);
   const [tabelaPontos, setTabelaPontos] = useState('1:100,2:70,3:50,4:40,5:30,6:25,7:20,8:15,9:10');
   const [premiacao, setPremiacao] = useState('50,30,20');
   const [blinds, setBlinds] = useState<BlindLevel[]>([]);
@@ -33,7 +33,7 @@ export default function ConfiguracoesPage() {
         setBuyInPadrao(config.buy_in_padrao);
         setRebuyPadrao(config.rebuy_padrao);
         setAddonPadrao(config.addon_padrao);
-        setRakePadrao(config.rake_padrao);
+        setRakeValorPadrao(config.rake_valor_padrao ?? config.rake_padrao ?? 10);
 
         // Parse tabela pontos
         const tp = config.tabela_pontos as Record<string, number>;
@@ -76,7 +76,7 @@ export default function ConfiguracoesPage() {
       buy_in_padrao: buyInPadrao,
       rebuy_padrao: rebuyPadrao,
       addon_padrao: addonPadrao,
-      rake_padrao: rakePadrao,
+      rake_valor_padrao: rakeValorPadrao,
       tabela_pontos: tp,
       estrutura_premiacao_padrao: prem,
       estrutura_blinds_padrao: blinds,
@@ -173,8 +173,8 @@ export default function ConfiguracoesPage() {
                 className="w-full h-14 px-4 rounded-xl bg-[#1e1e1e] border border-[#2a2a2a] text-[#f0f0f0] text-lg font-bold focus:outline-none focus:border-[#8b5cf6]" />
             </div>
             <div>
-              <label className="text-[#888] text-xs font-bold uppercase mb-1 block">Rake (%)</label>
-              <input type="number" value={rakePadrao} onChange={(e) => setRakePadrao(Number(e.target.value))}
+              <label className="text-[#888] text-xs font-bold uppercase mb-1 block">Rake por buy-in (R$)</label>
+              <input type="number" value={rakeValorPadrao} onChange={(e) => setRakeValorPadrao(Number(e.target.value))}
                 className="w-full h-14 px-4 rounded-xl bg-[#1e1e1e] border border-[#2a2a2a] text-[#f0f0f0] text-lg font-bold focus:outline-none focus:border-[#8b5cf6]" />
             </div>
           </div>

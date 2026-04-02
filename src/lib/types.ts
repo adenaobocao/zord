@@ -17,6 +17,7 @@ export interface Evento {
   rebuy_valor: number;
   addon_valor: number;
   rake_percent: number;
+  rake_valor: number;
   status: EventoStatus;
   timer_minutos: number;
   timer_restante_ms: number | null;
@@ -70,6 +71,7 @@ export interface ConfigGerente {
   rebuy_padrao: number;
   addon_padrao: number;
   rake_padrao: number;
+  rake_valor_padrao: number;
   tabela_pontos: Record<string, number>;
   estrutura_premiacao_padrao: number[];
   estrutura_blinds_padrao: BlindLevel[];
