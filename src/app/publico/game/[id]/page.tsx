@@ -105,19 +105,21 @@ export default function PublicoGamePage() {
           {/* Left: Timer + Blinds */}
           <div className="lg:flex-1 flex flex-col items-center justify-center p-6 lg:p-12 lg:border-r lg:border-[#2a2a2a]">
             <div className={cn(
-              'font-mono font-black tabular-nums tracking-tight mb-6',
-              'text-7xl lg:text-[12rem] leading-none',
+              'font-mono font-black tabular-nums tracking-tighter',
+              'text-[6rem] md:text-[10rem] lg:text-[18rem] xl:text-[22rem] 2xl:text-[26rem] leading-[0.85]',
               isZero && 'text-[#ef4444] animate-pulse',
               isLow && !isZero && 'text-[#eab308]',
               !isLow && !isZero && 'text-[#f0f0f0]'
             )}>
               {formatTimer(localMs)}
             </div>
-            <BlindDisplay blinds={blinds} currentLevel={evento.blind_level_atual} />
+            <div className="mt-2 lg:mt-4">
+              <BlindDisplay blinds={blinds} currentLevel={evento.blind_level_atual} />
+            </div>
           </div>
 
           {/* Right: Players */}
-          <div className="lg:w-[400px] xl:w-[480px] p-4 lg:p-6 overflow-y-auto max-h-[calc(100vh-80px)]">
+          <div className="lg:w-[320px] xl:w-[380px] p-4 lg:p-6 overflow-y-auto max-h-[calc(100vh-80px)]">
             <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
               {participacoes.map((p) => (
                 <div key={p.id} className="flex items-center justify-between rounded-xl bg-[#141414] border border-[#2a2a2a] px-4 py-3">
@@ -214,15 +216,17 @@ export default function PublicoGamePage() {
           {/* Left: Timer + Blinds + Prize */}
           <div className="lg:flex-1 flex flex-col items-center justify-center p-6 lg:p-12 lg:border-r lg:border-[#2a2a2a]">
             <div className={cn(
-              'font-mono font-black tabular-nums tracking-tight mb-6',
-              'text-7xl lg:text-[12rem] leading-none',
+              'font-mono font-black tabular-nums tracking-tighter',
+              'text-[6rem] md:text-[10rem] lg:text-[18rem] xl:text-[22rem] 2xl:text-[26rem] leading-[0.85]',
               isZero && 'text-[#ef4444] animate-pulse',
               isLow && !isZero && 'text-[#eab308]',
               !isLow && !isZero && 'text-[#f0f0f0]'
             )}>
               {formatTimer(localMs)}
             </div>
-            <BlindDisplay blinds={blinds} currentLevel={evento.blind_level_atual} />
+            <div className="mt-2 lg:mt-4">
+              <BlindDisplay blinds={blinds} currentLevel={evento.blind_level_atual} />
+            </div>
 
             {/* Prize info */}
             {premiacao.length > 0 && (
@@ -244,7 +248,7 @@ export default function PublicoGamePage() {
           </div>
 
           {/* Right: Players */}
-          <div className="lg:w-[400px] xl:w-[480px] p-4 lg:p-6 overflow-y-auto max-h-[calc(100vh-80px)]">
+          <div className="lg:w-[320px] xl:w-[380px] p-4 lg:p-6 overflow-y-auto max-h-[calc(100vh-80px)]">
             <p className="text-[#22c55e] text-xs font-bold uppercase tracking-wider mb-3">
               <Skull size={14} className="inline mr-1" />
               Restantes ({ativos.length})
