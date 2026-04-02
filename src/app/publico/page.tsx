@@ -131,7 +131,7 @@ export default function PublicoPage() {
 
       <div className="max-w-lg mx-auto px-4 pb-8">
         {/* Live game banner */}
-        {eventoAtivo && eventoAtivo.status !== 'cadastro' && (
+        {eventoAtivo && (
           <Link
             href={`/publico/game/${eventoAtivo.id}`}
             className="flex items-center gap-4 rounded-2xl bg-[#22c55e]/10 border border-[#22c55e]/30 p-4 mb-6 hover:bg-[#22c55e]/15 transition-colors"
@@ -315,6 +315,14 @@ export default function PublicoPage() {
 
         {/* Footer links */}
         <div className="flex flex-col gap-3">
+          {eventoAtivo && (
+            <Link
+              href={`/publico/game/${eventoAtivo.id}`}
+              className="flex items-center justify-center gap-2 w-full h-12 rounded-xl bg-[#22c55e]/10 border border-[#22c55e]/30 text-[#22c55e] font-bold text-sm hover:bg-[#22c55e]/15 transition-colors"
+            >
+              <Tv size={16} /> Tela do Jogo (TV)
+            </Link>
+          )}
           <Link
             href="/publico/ranking"
             className="flex items-center justify-center gap-2 w-full h-12 rounded-xl bg-[#141414] border border-[#2a2a2a] text-[#888] font-bold text-sm hover:bg-[#1a1a1a] transition-colors"
