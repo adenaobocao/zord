@@ -86,12 +86,16 @@ export default function PublicoPage() {
     if (allNames.includes(trimmed.toLowerCase())) return;
 
     setAdding(true);
-    const { data } = await supabase.from('inscricoes').insert({ nome: trimmed }).select().single();
-    if (data) {
+    const { data, error } = await supabase.from('inscricoes').insert({ nome: trimmed }).select();
+    if (data && data.length > 0) {
       const newIds = new Set(myIds);
-      newIds.add(data.id);
+      newIds.add(data[0].id);
       setMyIds(newIds);
       try { localStorage.setItem('zord_my_inscricoes', JSON.stringify([...newIds])); } catch {}
+    }
+    if (error) {
+      // Fallback: insert worked but select failed (RLS), just reload
+      await loadInscricoes();
     }
     setNome('');
     setAdding(false);
@@ -264,17 +268,17 @@ export default function PublicoPage() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="flex flex-col gap-1.5">
             {/* Fixed initial players */}
             {CONFIRMADOS_INICIAIS.map((playerName, i) => (
               <div
                 key={`fixed-${i}`}
-                className="flex items-center gap-2.5 rounded-xl bg-[#141414] border border-[#2a2a2a] px-3 py-3"
+                className="flex items-center gap-3 rounded-xl bg-[#141414] border border-[#2a2a2a] px-4 py-3"
               >
                 <span className="w-7 h-7 rounded-lg bg-[#22c55e]/15 text-[#22c55e] font-black text-xs flex items-center justify-center shrink-0">
                   {i + 1}
                 </span>
-                <span className="text-[#f0f0f0] font-bold text-sm truncate">{playerName}</span>
+                <span className="text-[#f0f0f0] font-bold truncate">{playerName}</span>
               </div>
             ))}
 
@@ -282,12 +286,12 @@ export default function PublicoPage() {
             {inscricoes.map((insc, i) => (
               <div
                 key={insc.id}
-                className="flex items-center gap-2.5 rounded-xl bg-[#8b5cf6]/5 border border-[#8b5cf6]/20 px-3 py-3"
+                className="flex items-center gap-3 rounded-xl bg-[#8b5cf6]/5 border border-[#8b5cf6]/20 px-4 py-3"
               >
                 <span className="w-7 h-7 rounded-lg bg-[#8b5cf6]/15 text-[#8b5cf6] font-black text-xs flex items-center justify-center shrink-0">
                   {CONFIRMADOS_INICIAIS.length + i + 1}
                 </span>
-                <span className="text-[#f0f0f0] font-bold text-sm truncate flex-1">{insc.nome}</span>
+                <span className="text-[#f0f0f0] font-bold truncate flex-1">{insc.nome}</span>
                 {myIds.has(insc.id) && (
                   <button
                     onClick={() => handleRemover(insc.id)}
@@ -298,13 +302,26 @@ export default function PublicoPage() {
                 )}
               </div>
             ))}
-          </div>
 
-          {vagasRestantes > 0 && vagasRestantes <= 5 && (
-            <p className="text-[#888] text-xs text-center mt-3">
-              {vagasRestantes} vaga{vagasRestantes > 1 ? 's' : ''} restante{vagasRestantes > 1 ? 's' : ''}
-            </p>
-          )}
+            {/* Empty slots - show next few open spots */}
+            {vagasRestantes > 0 && Array.from({ length: Math.min(vagasRestantes, 5) }).map((_, i) => (
+              <div
+                key={`vaga-${i}`}
+                className="flex items-center gap-3 rounded-xl border border-dashed border-[#2a2a2a]/60 px-4 py-3"
+              >
+                <span className="w-7 h-7 rounded-lg bg-[#2a2a2a]/50 text-[#888]/50 font-black text-xs flex items-center justify-center shrink-0">
+                  {totalConfirmados + i + 1}
+                </span>
+                <span className="text-[#888]/40 italic text-sm">vaga aberta</span>
+              </div>
+            ))}
+
+            {vagasRestantes > 5 && (
+              <p className="text-[#888] text-xs text-center py-2">
+                + {vagasRestantes - 5} vagas disponiveis
+              </p>
+            )}
+          </div>
 
           {vagasRestantes <= 0 && (
             <div className="rounded-xl bg-[#ef4444]/10 border border-[#ef4444]/30 p-3 text-center mt-3">

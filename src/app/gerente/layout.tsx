@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { LayoutDashboard, Users, Trophy, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, Trophy, Settings, LogOut, ExternalLink } from 'lucide-react';
 import { supabase } from '@/lib/supabase-client';
 import { ToastProvider } from '@/components/toast';
 import { cn } from '@/lib/utils';
@@ -93,13 +93,23 @@ export default function GerenteLayout({ children }: { children: React.ReactNode 
               </Link>
             );
           })}
-          <button
-            onClick={handleLogout}
-            className="ml-auto flex items-center gap-2 px-4 py-2 rounded-lg text-[#888] hover:text-[#ef4444] hover:bg-[#ef4444]/10 font-bold text-sm transition-colors"
-          >
-            <LogOut size={18} />
-            Sair
-          </button>
+          <div className="ml-auto flex items-center gap-2">
+            <Link
+              href="/publico"
+              target="_blank"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-[#888] hover:text-[#8b5cf6] hover:bg-[#8b5cf6]/10 font-bold text-sm transition-colors"
+            >
+              <ExternalLink size={16} />
+              Publico
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-[#888] hover:text-[#ef4444] hover:bg-[#ef4444]/10 font-bold text-sm transition-colors"
+            >
+              <LogOut size={18} />
+              Sair
+            </button>
+          </div>
         </header>
 
         {/* Content */}
