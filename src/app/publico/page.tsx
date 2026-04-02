@@ -34,6 +34,15 @@ export default function PublicoPage() {
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
   const [eventoAtivo, setEventoAtivo] = useState<Evento | null>(null);
+  const [myIds, setMyIds] = useState<Set<string>>(new Set());
+
+  // Load my inscricoes from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('zord_my_inscricoes');
+      if (saved) setMyIds(new Set(JSON.parse(saved)));
+    } catch {}
+  }, []);
 
   async function loadInscricoes() {
     const { data } = await supabase
@@ -77,13 +86,23 @@ export default function PublicoPage() {
     if (allNames.includes(trimmed.toLowerCase())) return;
 
     setAdding(true);
-    await supabase.from('inscricoes').insert({ nome: trimmed });
+    const { data } = await supabase.from('inscricoes').insert({ nome: trimmed }).select().single();
+    if (data) {
+      const newIds = new Set(myIds);
+      newIds.add(data.id);
+      setMyIds(newIds);
+      try { localStorage.setItem('zord_my_inscricoes', JSON.stringify([...newIds])); } catch {}
+    }
     setNome('');
     setAdding(false);
   }
 
   async function handleRemover(id: string) {
     await supabase.from('inscricoes').delete().eq('id', id);
+    const newIds = new Set(myIds);
+    newIds.delete(id);
+    setMyIds(newIds);
+    try { localStorage.setItem('zord_my_inscricoes', JSON.stringify([...newIds])); } catch {}
   }
 
   const totalConfirmados = CONFIRMADOS_INICIAIS.length + inscricoes.length;
@@ -269,12 +288,14 @@ export default function PublicoPage() {
                   {CONFIRMADOS_INICIAIS.length + i + 1}
                 </span>
                 <span className="text-[#f0f0f0] font-bold text-sm truncate flex-1">{insc.nome}</span>
-                <button
-                  onClick={() => handleRemover(insc.id)}
-                  className="w-7 h-7 rounded-lg text-[#ef4444]/40 hover:text-[#ef4444] hover:bg-[#ef4444]/10 flex items-center justify-center transition-colors shrink-0"
-                >
-                  <X size={14} />
-                </button>
+                {myIds.has(insc.id) && (
+                  <button
+                    onClick={() => handleRemover(insc.id)}
+                    className="w-7 h-7 rounded-lg text-[#ef4444]/40 hover:text-[#ef4444] hover:bg-[#ef4444]/10 flex items-center justify-center transition-colors shrink-0"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
               </div>
             ))}
           </div>
